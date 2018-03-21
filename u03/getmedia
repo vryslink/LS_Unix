@@ -1,0 +1,20 @@
+#!/bin/bash
+
+if [ "$1" = "--help" ] ; then
+	echo "Pomoci getmedia lze v html souboru nalezt odkazy na obrazky a zvuky"
+	echo "Jako URL povazuje format \"https://www.jmeno.koncovka/soubory\""
+	echo "Getmedia prijima jediny parametr, a to jmeno html souboru, ve kterem ma hledat"
+	echo "Pomoci prepinace -i zobrazi jen odkazy na obrazky"
+	echo "Pomoci prepinace -s zobrazi jen odkazy na zvuky"
+
+elif [ "$1" = "-s" ] ; then 
+	cat $2 | grep -oE "http[s]*:\/\/www\.[^\.]*\.[a-z]*[^\.>]*\.[wmo][pag][gv3]"
+
+elif [ "$1" = "-i" ] ; then
+	cat $2 | grep -oE "http[s]*:\/\/www\.[^\.]*\.[a-z]*[^\.>]*\.[jps][pnv][g]" 
+		
+else
+	cat $1 | grep -oE "http[s]*:\/\/www\.[^\.]*\.[a-z]*[^\.>]*\.[jpswmo][pnvag][gv3]"
+fi
+
+
