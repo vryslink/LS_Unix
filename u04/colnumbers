@@ -1,0 +1,10 @@
+#!/bin/bash
+
+x=$(head -n1 "$1" | tr \; ' ')
+j=0
+
+for i in $x
+do
+	j=$(($j+1))
+	echo $j $i
+done

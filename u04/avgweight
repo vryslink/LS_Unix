@@ -1,0 +1,16 @@
+#!/bin/bash
+
+cisloSloupce=$(./colnumbers $1 | grep '[0-9]* Weight' | cut -d' ' -f1) 
+
+suma=0
+pocetRadku=0
+
+cut -d\; -f $cisloSloupce $1 | grep -oE '[0-9]+' | (while read hmotnost 
+do
+	
+	pocetRadku=$(($pocetRadku + 1))
+	suma=$(($suma + $hmotnost))
+	
+done
+
+echo $(($suma / $pocetRadku)))
