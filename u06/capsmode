@@ -1,0 +1,89 @@
+#!/bin/bash
+
+
+najdiAllCapsRadky () {
+find $adresa -type f > /tmp/vsechnyAdresy 2> /dev/null || echo "adresa $adresa neexistuje" >&2 
+egrep -e '.*\/[A-Z -.]+$' /tmp/vsechnyAdresy > /tmp/adresySVelkymi;
+}
+
+najdiLowerCaseRadky () {
+find $adresa -type f > /tmp/vsechnyAdresy 2> /dev/null || if [ $adresa != '-r' ] ; then  echo "adresa $adresa neexistuje" >&2 ; fi 
+egrep -e '.*\/[a-z -.]+$' /tmp/vsechnyAdresy > /tmp/adresySMalymi;
+}
+
+zmensiPismo () {
+while read line  
+do
+        echo $line > /tmp/adresa
+
+        sed -E 's/[^\/]+$//g' /tmp/adresa > /tmp/zacatek
+
+        egrep -o '[^\/]+$' /tmp/adresa | tr 'A-Z' 'a-z' > /tmp/konec
+
+        cat /tmp/zacatek /tmp/konec | tr -d '\n' > /tmp/novyNazev
+
+        mv $line `cat /tmp/novyNazev`
+
+done < /tmp/adresySVelkymi
+}
+
+
+zvetsiPismo () {
+while read line  
+do
+        echo $line > /tmp/adresa
+
+        sed -E 's/[^\/]+$//g' /tmp/adresa > /tmp/zacatek
+
+        egrep -o '[^\/]+$' /tmp/adresa | tr 'a-z' 'A-Z' > /tmp/konec
+
+        cat /tmp/zacatek /tmp/konec | tr -d '\n' > /tmp/novyNazev
+
+        mv $line `cat /tmp/novyNazev`
+
+done < /tmp/adresySMalymi
+}
+
+
+
+prevedNaVelka=ne
+	
+if [ "$#" = 0 ]
+then
+	adresa=.
+        najdiAllCapsRadky
+	zmensiPismo 
+
+elif [ "$#" = 1 ] && [ "$1" = '-r' ]
+then
+	adresa=.
+	najdiLowerCaseRadky
+	zvetsiPismo
+	shift
+
+else
+	for i in "$@"
+	do
+		if [ $i = '-r' ]
+		then
+			prevedNaVelka=ano
+		fi
+	done
+	
+	while [ $# != 0 ]
+        do
+                adresa=$1
+
+                if [ $prevedNaVelka = 'ano' ]
+                then
+                        najdiLowerCaseRadky
+                        zvetsiPismo
+
+                else
+                        najdiAllCapsRadky
+                        zmensiPismo 
+                fi
+
+                shift
+	done
+fi
