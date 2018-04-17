@@ -1,0 +1,28 @@
+#!/bin/bash
+
+souborSPatchem="$1"
+uloziste="$2"
+
+rozdelPatch(){
+while read line
+do
+	csplit -s --prefix=renameLOL. ccr.patch /"^diff"/ {*}  
+done <"$souborSPatchem"
+}
+
+prejmenujSoubory(){
+for file in renameLOL.*
+do
+	line=$(head -n 1 "$file")
+	prvniCast=$(echo "$line" | grep -o "a\/[^\ ]*" | sed 's/a\///' | sed 's/\//-/g')
+	druhaCast=$(echo "$line" | grep -o "b\/[^\ ]*$" | sed 's/b\///' | sed 's/\//-/g')
+	mv "$file" "$uloziste"/"$prvniCast".patch
+done
+
+
+
+}
+
+rozdelPatch
+prejmenujSoubory
+
