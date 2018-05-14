@@ -1,0 +1,80 @@
+#!/bin/bash
+
+#souborSPatchem="$1"
+#uloziste="$2"
+
+rozdelPatch(){
+#while read line
+#do
+	csplit -s --prefix=renameLOL. "$souborSPatchem" /"^diff"/ {*}  
+#done <"$souborSPatchem"
+}
+
+prejmenujSoubory(){
+for file in renameLOL.*
+do
+	line=$(head -n 1 "$file")
+	prvniCast=$(echo "$line" | grep -o "a\/[^\ ]*" | sed 's/a\///' | sed 's/\//-/g')
+	druhaCast=$(echo "$line" | grep -o "b\/[^\ ]*$" | sed 's/b\///' | sed 's/\//-/g')
+	mv "$file" "$uloziste"/"$prvniCast".patch
+done
+
+
+
+}
+patchNacten=false
+uloziste=''
+souborSPatchem=''
+
+while [ -n "$1" ]
+do
+	case "$1" in
+	-i)
+		if [[ "$2" = '-d' || "$2" = '' ]] #nacti ze vstupu
+		then
+			patchNacten=false	
+		else 
+			shift
+			souborSPatchem="$1"
+			patchNacten=true
+		fi
+		;;
+	-d)
+		shift
+		uloziste="$1"
+		;;
+
+	*)
+		ret_value=1
+		break
+		;;
+	
+	esac
+	shift
+done
+
+if [ "$ret_value" > 0 ]
+then
+	echo 'Neplatny option'
+	exit "$ret_value"
+fi
+
+if [ "$patchNacten" = false ]
+then
+	if [ -z "$uloziste" ] 
+	then
+		echo 'Nebyl zadan cilovy adresar ani nazev souboru'
+		exit 2
+	fi
+
+	read 'Zadejte nazev souboru s patchem: ' souborSPatchem
+fi
+if [ -z "$uloziste" ]
+then
+	uloziste=./"$souborSPatchem".splitpatch
+	mkdir "$uloziste"
+fi
+
+rozdelPatch
+prejmenujSoubory
+
